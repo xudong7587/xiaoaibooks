@@ -1,0 +1,252 @@
+name: Publish locally verified release images
+
+'on':
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing release tag: vMAJOR.MINOR.PATCH'
+        required: true
+        type: string
+
+# All compilation and platform validation happen locally before release upload.
+# This job only imports those exact archives and publishes their registry manifests.
+permissions: {}
+concurrency:
+  group: ghcr-release-publisher-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: write # Download own assets; upload only registry result JSON and its SHA256.
+      packages: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: ${{ inputs.tag }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Verify release assets and publish without rebuilding
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import datetime
+          import hashlib
+          import json
+          import os
+          from pathlib import Path, PurePosixPath
+          import re
+          import subprocess
+          import tarfile
+          import tempfile
+
+          HEX = r'[0-9a-f]{64}'
+          DIGEST = r'sha256:' + HEX
+          TAG = r'v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)'
+          SOURCE_LABEL = 'io.xiaoaibooks.source-fingerprint'
+          FILES = {'amd64': 'image-linux-amd64.tar.gz', 'arm64': 'image-linux-arm64.tar.gz'}
+
+          def require(condition, message):
+              if not condition:
+                  raise RuntimeError(message)
+
+          def unique_object(pairs):
+              result = {}
+              for key, value in pairs:
+                  require(key not in result, 'Duplicate JSON key rejected')
+                  result[key] = value
+              return result
+
+          def read_json(text):
+              return json.loads(text, object_pairs_hook=unique_object)
+
+          def validate_manifest(manifest, release_tag, repository):
+              require(isinstance(release_tag, str) and re.fullmatch(TAG, release_tag), 'Tag must be vMAJOR.MINOR.PATCH')
+              require(isinstance(repository, str) and re.fullmatch(r'[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+', repository), 'Invalid current repository')
+              require(isinstance(manifest, dict), 'Invalid release manifest')
+              required = {'schema', 'version', 'release_tag', 'source_fingerprint', 'images'}
+              require(required <= set(manifest), 'Missing release manifest fields')
+              require(type(manifest['schema']) is int and manifest['schema'] == 1, 'Unsupported release schema')
+              require(manifest['release_tag'] == release_tag and manifest['version'] == release_tag[1:], 'Release version mismatch')
+              fingerprint = manifest['source_fingerprint']
+              require(isinstance(fingerprint, str) and re.fullmatch(HEX, fingerprint), 'Invalid source fingerprint')
+              images = manifest['images']
+              require(isinstance(images, list) and 1 <= len(images) <= 2, 'Manifest must list one or two verified platforms')
+              seen = set()
+              for image in images:
+                  require(isinstance(image, dict), 'Invalid image record')
+                  fields = {'platform', 'architecture', 'file', 'sha256', 'loaded_tag', 'image_id'}
+                  require(set(image) == fields, 'Unexpected image fields or external URLs rejected')
+                  architecture = image['architecture']
+                  require(isinstance(architecture, str) and architecture in FILES and architecture not in seen, 'Unsupported or duplicate architecture')
+                  seen.add(architecture)
+                  require(image['platform'] == 'linux/' + architecture, 'Platform mismatch')
+                  require(image['file'] == FILES[architecture], 'Unexpected image filename')
+                  require(isinstance(image['sha256'], str) and re.fullmatch(HEX, image['sha256']), 'Invalid archive SHA256')
+                  require(image['loaded_tag'] == 'xiaoaibooks-release:' + manifest['version'] + '-' + architecture, 'Unexpected archive tag')
+                  require(isinstance(image['image_id'], str) and re.fullmatch(DIGEST, image['image_id']), 'Invalid image ID')
+              return manifest
+
+          def command(args, *, input_text=None):
+              # Never interpolate release data into a shell or log token-bearing stdin.
+              result = subprocess.run(args, input=input_text, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+              require(result.returncode == 0, 'Command failed: ' + ' '.join(args[:2]) + ' (exit ' + str(result.returncode) + ')')
+              return result.stdout
+
+          def download(tag, repository, filename, directory):
+              # Exact, validated filenames from this repository's own release only.
+              command(['gh', 'release', 'download', tag, '--repo', repository, '--pattern', filename, '--dir', str(directory)])
+              result = directory / filename
+              require(result.is_file() and not result.is_symlink(), 'Expected release asset was not downloaded')
+              return result
+
+          def sha256_file(filename):
+              with filename.open('rb') as file:
+                  return hashlib.file_digest(file, 'sha256').hexdigest()
+
+          def validate_archive(filename, expected, fingerprint):
+              # image_id always means SHA256(Config JSON bytes), never inspect.Id:
+              # classic Docker reports that config ID, containerd can report a manifest ID.
+              # Read metadata members without extracting any archive paths to the host.
+              with tarfile.open(filename, 'r:*') as archive:
+                  members = {}
+                  for member in archive:
+                      path = PurePosixPath(member.name)
+                      require(not path.is_absolute() and '..' not in path.parts and len(member.name) <= 4096, 'Unsafe image archive path')
+                      require(member.isfile() or member.isdir(), 'Image archive links or special entries are not permitted')
+                      name = str(path)
+                      require(name not in members and len(members) < 100000, 'Duplicate or excessive image archive entries')
+                      members[name] = member
+
+                  def metadata(name, limit):
+                      path = PurePosixPath(name)
+                      require(not path.is_absolute() and '..' not in path.parts, 'Unsafe image metadata path')
+                      member = members.get(str(path))
+                      require(member is not None and member.isfile() and 0 < member.size <= limit, 'Missing or unsafe image metadata')
+                      with archive.extractfile(member) as source:
+                          return source.read(limit + 1)
+
+                  manifests = read_json(metadata('manifest.json', 1024 * 1024))
+                  require(isinstance(manifests, list) and len(manifests) == 1 and isinstance(manifests[0], dict), 'Expected exactly one docker-save image')
+                  record = manifests[0]
+                  require(record.get('RepoTags') == [expected['loaded_tag']], 'Archive image tag mismatch')
+                  config_name = record.get('Config')
+                  require(isinstance(config_name, str) and bool(config_name), 'Missing image Config path')
+                  config_bytes = metadata(config_name, 16 * 1024 * 1024)
+                  config_digest = 'sha256:' + hashlib.sha256(config_bytes).hexdigest()
+                  require(config_digest == expected['image_id'], 'Archive Config SHA256 mismatch')
+                  config = read_json(config_bytes)
+                  require(isinstance(config, dict) and config.get('os') == 'linux' and config.get('architecture') == expected['architecture'], 'Archive Config platform mismatch')
+                  runtime = config.get('config')
+                  require(isinstance(runtime, dict) and isinstance(runtime.get('Labels'), dict) and runtime['Labels'].get(SOURCE_LABEL) == fingerprint, 'Archive Config provenance mismatch')
+                  return config_digest
+
+          def validate_loaded(value, expected, fingerprint):
+              require(isinstance(value, list) and len(value) == 1 and isinstance(value[0], dict), 'Invalid loaded image inspection')
+              image = value[0]
+              require(isinstance(image.get('Id'), str) and re.fullmatch(DIGEST, image['Id']), 'Invalid observed loaded image ID')
+              require(image.get('Os') == 'linux' and image.get('Architecture') == expected['architecture'], 'Loaded image platform mismatch')
+              config = image.get('Config')
+              require(isinstance(config, dict) and isinstance(config.get('Labels'), dict), 'Missing image provenance label')
+              require(config['Labels'].get(SOURCE_LABEL) == fingerprint, 'Loaded source fingerprint mismatch')
+
+          def registry_descriptor(reference):
+              value = read_json(command(['docker', 'buildx', 'imagetools', 'inspect', reference, '--format', '{{json .Manifest}}']))
+              require(isinstance(value, dict) and isinstance(value.get('digest'), str) and re.fullmatch(DIGEST, value['digest']), 'Missing registry digest')
+              return value
+
+          def validate_index(value, published):
+              require(isinstance(value, dict) and isinstance(value.get('manifests'), list), 'Expected a registry manifest list')
+              actual = []
+              for child in value['manifests']:
+                  require(isinstance(child, dict) and isinstance(child.get('platform'), dict), 'Invalid platform descriptor')
+                  platform = child['platform']
+                  require(platform.get('os') == 'linux' and platform.get('architecture') in FILES, 'Unexpected published platform')
+                  actual.append((platform['architecture'], child.get('digest')))
+              expected = [(image['architecture'], image['registry_digest']) for image in published]
+              require(len(actual) == len(expected) and set(actual) == set(expected), 'Published platforms or digests differ from verified assets')
+
+          def main():
+              tag = os.environ['RELEASE_TAG']
+              repository = os.environ['GH_REPO']
+              require(re.fullmatch(TAG, tag), 'Tag must be vMAJOR.MINOR.PATCH')
+              require(re.fullmatch(r'[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+', repository), 'Invalid current repository')
+              registry = 'ghcr.io/' + repository.lower()
+              require(os.environ.get('GH_TOKEN'), 'Missing repository GITHUB_TOKEN')
+              with tempfile.TemporaryDirectory(prefix='xiaoaibooks-publish-', dir=os.environ['RUNNER_TEMP']) as temporary:
+                  directory = Path(temporary)
+                  manifest_file = download(tag, repository, 'RELEASE-MANIFEST.json', directory)
+                  require(manifest_file.stat().st_size <= 1024 * 1024, 'Release manifest exceeds limit')
+                  manifest = validate_manifest(read_json(manifest_file.read_text()), tag, repository)
+                  fingerprint = manifest['source_fingerprint']
+                  # Complete every checksum and every local image check before the first push.
+                  for image in manifest['images']:
+                      archive = download(tag, repository, image['file'], directory)
+                      require(sha256_file(archive) == image['sha256'], 'Image archive checksum mismatch')
+                      validate_archive(archive, image, fingerprint)
+                  loaded_ids = {}
+                  for image in manifest['images']:
+                      command(['docker', 'load', '--input', str(directory / image['file'])])
+                      inspected = read_json(command(['docker', 'image', 'inspect', image['loaded_tag']]))
+                      validate_loaded(inspected, image, fingerprint)
+                      loaded_ids[image['architecture']] = inspected[0]['Id']
+                      # An export proves the loaded tag's actual Config digest on either store.
+                      exported = directory / ('loaded-' + image['architecture'] + '.tar')
+                      try:
+                          command(['docker', 'image', 'save', '--output', str(exported), image['loaded_tag']])
+                          validate_archive(exported, image, fingerprint)
+                      finally:
+                          exported.unlink(missing_ok=True)
+                  print('Validated all locally built release images; no image was rebuilt or started.')
+                  command(['docker', 'login', 'ghcr.io', '--username', os.environ['GITHUB_ACTOR'], '--password-stdin'], input_text=os.environ['GH_TOKEN'] + '\n')
+                  try:
+                      published = []
+                      for image in manifest['images']:
+                          reference = registry + ':' + manifest['version'] + '-' + image['architecture']
+                          command(['docker', 'tag', image['loaded_tag'], reference])
+                          command(['docker', 'push', reference])
+                          descriptor = registry_descriptor(reference)
+                          raw = read_json(command(['docker', 'buildx', 'imagetools', 'inspect', reference, '--raw']))
+                          require(isinstance(raw, dict) and 'manifests' not in raw, 'Architecture push produced an index; refusing version/latest publication')
+                          require(isinstance(raw, dict) and isinstance(raw.get('config'), dict) and raw['config'].get('digest') == image['image_id'], 'Pushed image config differs from verified local image')
+                          published.append({**image, 'registry_ref': reference, 'registry_digest': descriptor['digest']})
+                      version_ref = registry + ':' + manifest['version']
+                      sources = [registry + '@' + image['registry_digest'] for image in published]
+                      command(['docker', 'buildx', 'imagetools', 'create', '--tag', version_ref, *sources])
+                      version_descriptor = registry_descriptor(version_ref)
+                      validate_index(version_descriptor, published)
+                      # Publish latest only after the immutable version's complete index is checked.
+                      latest_ref = registry + ':latest'
+                      command(['docker', 'buildx', 'imagetools', 'create', '--tag', latest_ref, registry + '@' + version_descriptor['digest']])
+                      latest_descriptor = registry_descriptor(latest_ref)
+                      require(latest_descriptor['digest'] == version_descriptor['digest'], 'Latest does not match the verified version index')
+                      result = {
+                          'schema': 1, 'version': manifest['version'], 'release_tag': tag,
+                          'source_fingerprint': fingerprint, 'release_manifest_sha256': sha256_file(manifest_file),
+                          'registry': registry, 'version_ref': version_ref, 'latest_ref': latest_ref,
+                          'index_digest': version_descriptor['digest'], 'images': published,
+                          'image_id_semantics': 'sha256-of-docker-save-config-json',
+                          'runner_observed_ids': loaded_ids,
+                          'published_at': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                          'workflow_run_id': os.environ.get('GITHUB_RUN_ID', ''),
+                      }
+                      result_file = directory / 'REGISTRY-MANIFEST.json'
+                      result_file.write_text(json.dumps(result, indent=2) + '\n')
+                      checksum_file = directory / 'REGISTRY-MANIFEST.sha256'
+                      checksum_file.write_text(sha256_file(result_file) + '  REGISTRY-MANIFEST.json\n')
+                      command(['gh', 'release', 'upload', tag, str(result_file), str(checksum_file), '--repo', repository, '--clobber'])
+                      summary = os.environ.get('GITHUB_STEP_SUMMARY')
+                      if summary:
+                          with open(summary, 'a') as output:
+                              output.write('Published `' + version_ref + '@' + result['index_digest'] + '` from verified release archives.\n\n')
+                              output.write('Source fingerprint: `' + fingerprint + '`. No cloud build or container execution.\n')
+                      print('Published version/latest indexes and uploaded REGISTRY-MANIFEST.json.')
+                  finally:
+                      subprocess.run(['docker', 'logout', 'ghcr.io'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+          if __name__ == '__main__':
+              main()
+          PY

@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "version": "0.2.0",
+  "release_tag": "v0.2.0",
+  "source_fingerprint": "0f9c56bfa91d90167b97754e958416a9e5b11171012372744754972503ffaf3f",
+  "image_id_semantics": "SHA256 of the exact image configuration JSON from the Docker archive; independent of Docker image store manifest IDs",
+  "images": [
+    {
+      "platform": "linux/amd64",
+      "architecture": "amd64",
+      "file": "image-linux-amd64.tar.gz",
+      "sha256": "dbaa725e2336c797c582bfe80ecf390ca14054c589ba9646f500a52de33b3ba3",
+      "loaded_tag": "xiaoaibooks-release:0.2.0-amd64",
+      "image_id": "sha256:e0179c5231d6223e1fa7d01d4ed0dd79def4aeceabe893e86c979bb78bd62efc"
+    },
+    {
+      "platform": "linux/arm64",
+      "architecture": "arm64",
+      "file": "image-linux-arm64.tar.gz",
+      "sha256": "81d32cb78ba6f9c91dc75ea6365ab2fcb2c6e74df4b62cd4bb5cab840f5281be",
+      "loaded_tag": "xiaoaibooks-release:0.2.0-arm64",
+      "image_id": "sha256:159fa1d5c0966fe96a0bc36a3776d2c115d79506ab8efaf1d7a181740b4c604b"
+    }
+  ],
+  "build_observed_ids": {
+    "amd64": "sha256:e0179c5231d6223e1fa7d01d4ed0dd79def4aeceabe893e86c979bb78bd62efc",
+    "arm64": "sha256:bffb7dbaf4e5edff86bbb2da61ec41e65e913a8fb6fc440849d406c7432a2db9"
+  },
+  "validation": {
+    "backend_tests": 573,
+    "frontend_tests": 32,
+    "typescript_and_frontend_build": "passed",
+    "known_python_dependency_vulnerabilities": 0,
+    "known_production_npm_dependency_vulnerabilities": 0,
+    "platforms": {
+      "amd64": {
+        "image_checks": 70,
+        "passed": true,
+        "fresh_install_network": "none",
+        "runtime_user": "10001:10001",
+        "read_only": true,
+        "restart_persistence": true,
+        "source_packs_included": false,
+        "private_data_included": false
+      },
+      "arm64": {
+        "image_checks": 70,
+        "passed": true,
+        "fresh_install_network": "none",
+        "runtime_user": "10001:10001",
+        "read_only": true,
+        "restart_persistence": true,
+        "source_packs_included": false,
+        "private_data_included": false
+      }
+    },
+    "not_covered": [
+      "All Xiaomi models and firmware versions",
+      "Prefix-only wildcard training for arbitrary music names",
+      "Live WeCom end-to-end administrator message exchange has not yet been accepted"
+    ]
+  }
+}

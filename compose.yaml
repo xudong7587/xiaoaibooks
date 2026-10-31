@@ -1,0 +1,27 @@
+name: xiaoaibooks
+services:
+  app:
+    image: ghcr.io/xudong7587/xiaoaibooks:0.2.0
+    ports:
+      - "${PUBLISH_IP:-127.0.0.1}:${PUBLISH_PORT:-18765}:18765"
+    environment:
+      P0_ADMIN_TOKEN: "${P0_ADMIN_TOKEN:?Generate a strong administrator password in .env}"
+      APP_DATA_DIR: /data
+      XIAOMI_TOKEN_CACHE: /data/xiaomi-token.json
+      MUSICTAG_DB: ""
+    volumes:
+      - data:/data
+    read_only: true
+    tmpfs:
+      - /tmp:size=256m,mode=1777
+    shm_size: 128m
+    mem_limit: 1536m
+    cpus: 2
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    restart: unless-stopped
+    stop_grace_period: 90s
+volumes:
+  data:
