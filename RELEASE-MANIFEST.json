@@ -1,63 +1,54 @@
 {
   "schema": 1,
-  "version": "0.2.0",
-  "release_tag": "v0.2.0",
-  "source_fingerprint": "0f9c56bfa91d90167b97754e958416a9e5b11171012372744754972503ffaf3f",
-  "image_id_semantics": "SHA256 of the exact image configuration JSON from the Docker archive; independent of Docker image store manifest IDs",
+  "version": "0.2.1",
+  "release_tag": "v0.2.1",
+  "source_fingerprint": "2b2aaf50326d4ca8ac60e1930d42ba7bd17aa802b6c19f85607258ecc892975b",
+  "image_id_semantics": "SHA256 of exact Docker archive Config JSON bytes",
   "images": [
     {
       "platform": "linux/amd64",
       "architecture": "amd64",
       "file": "image-linux-amd64.tar.gz",
-      "sha256": "dbaa725e2336c797c582bfe80ecf390ca14054c589ba9646f500a52de33b3ba3",
-      "loaded_tag": "xiaoaibooks-release:0.2.0-amd64",
-      "image_id": "sha256:e0179c5231d6223e1fa7d01d4ed0dd79def4aeceabe893e86c979bb78bd62efc"
+      "sha256": "a03a8638e0df9609a4c056c893cd0b6faf3642bcf266a768ad12fc4ca035c4c3",
+      "loaded_tag": "xiaoaibooks-release:0.2.1-amd64",
+      "image_id": "sha256:b24f0f53485f182d4501dc94e92d967b37c220e009f08dfccb291c21da9ae8e0"
     },
     {
       "platform": "linux/arm64",
       "architecture": "arm64",
       "file": "image-linux-arm64.tar.gz",
-      "sha256": "81d32cb78ba6f9c91dc75ea6365ab2fcb2c6e74df4b62cd4bb5cab840f5281be",
-      "loaded_tag": "xiaoaibooks-release:0.2.0-arm64",
-      "image_id": "sha256:159fa1d5c0966fe96a0bc36a3776d2c115d79506ab8efaf1d7a181740b4c604b"
+      "sha256": "c203d75fd04f93c927911d2620fc138c3a52b2e2611edb81aa6027cda1a2bc06",
+      "loaded_tag": "xiaoaibooks-release:0.2.1-arm64",
+      "image_id": "sha256:21f8a8f21a6cf2705f93c459e20391c44e1719723541f358f1ad1f2e44b441c2"
     }
   ],
-  "build_observed_ids": {
-    "amd64": "sha256:e0179c5231d6223e1fa7d01d4ed0dd79def4aeceabe893e86c979bb78bd62efc",
-    "arm64": "sha256:bffb7dbaf4e5edff86bbb2da61ec41e65e913a8fb6fc440849d406c7432a2db9"
-  },
   "validation": {
-    "backend_tests": 573,
+    "backend_tests": 615,
     "frontend_tests": 32,
-    "typescript_and_frontend_build": "passed",
-    "known_python_dependency_vulnerabilities": 0,
-    "known_production_npm_dependency_vulnerabilities": 0,
+    "frontend_typecheck_build": "passed",
+    "entrypoint_linux_permission_checks": 24,
+    "full_arm64_bind_checks": 21,
     "platforms": {
       "amd64": {
         "image_checks": 70,
         "passed": true,
-        "fresh_install_network": "none",
-        "runtime_user": "10001:10001",
-        "read_only": true,
-        "restart_persistence": true,
-        "source_packs_included": false,
-        "private_data_included": false
+        "runtime_nonroot": true,
+        "first_token_characters": 8,
+        "sources_bundled": false
       },
       "arm64": {
         "image_checks": 70,
         "passed": true,
-        "fresh_install_network": "none",
-        "runtime_user": "10001:10001",
-        "read_only": true,
-        "restart_persistence": true,
-        "source_packs_included": false,
-        "private_data_included": false
+        "runtime_nonroot": true,
+        "first_token_characters": 8,
+        "sources_bundled": false
       }
     },
+    "nas_restart_data_retention": "passed",
+    "wecom_administrator_search_and_numbered_prepare": "accepted_by_user",
     "not_covered": [
-      "All Xiaomi models and firmware versions",
-      "Prefix-only wildcard training for arbitrary music names",
-      "Live WeCom end-to-end administrator message exchange has not yet been accepted"
+      "All Xiaomi models and firmware",
+      "Wildcard training for arbitrary music names"
     ]
   }
 }

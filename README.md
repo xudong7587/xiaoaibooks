@@ -18,51 +18,48 @@
 
 ## Docker Compose 部署
 
-需要 Docker Engine、Docker Compose v2，以及可连接所用小爱音箱的家庭网络。实际提供的架构、镜像身份和本地验证内容见[对应版本发布页](https://github.com/xudong7587/xiaoaibooks/releases)：本版提供 `linux/amd64` 与 `linux/arm64`。`RELEASE-MANIFEST.json` 是本地镜像清单，`REGISTRY-MANIFEST.json` 记录成功推送后的 GHCR 摘要；发布附件另提供 SHA256 校验文件。
+支持 Linux `amd64` 和 `arm64`。复制下面的 Compose，只需要设置 **NAS 端口、数据目录和至少 8 位的管理员令牌**；不需要 `.env`，也不在这里填写小米等账号。
 
-```sh
-mkdir xiaoaibooks
-cd xiaoaibooks
-curl -fLO https://raw.githubusercontent.com/xudong7587/xiaoaibooks/main/compose.yaml
-curl -fLO https://raw.githubusercontent.com/xudong7587/xiaoaibooks/main/.env.example
-cp .env.example .env
+```yaml
+services:
+  app:
+    image: ghcr.io/xudong7587/xiaoaibooks:0.2.1
+    container_name: xiaoaibooks
+    ports:
+      - "18765:18765" # 左侧为 NAS 端口
+    volumes:
+      - "./data:/data" # 左侧为你的数据目录
+    environment:
+      P0_ADMIN_TOKEN: "" # 必填：设置至少 8 位的管理员令牌
+    restart: unless-stopped
+    stop_grace_period: 90s
 ```
 
-如果从 Release 附件下载，`default.env.example` 与仓库 `.env.example` 内容相同，将它复制为 `.env` 即可。
-
-编辑 `.env`：
-
-1. 用 `openssl rand -hex 32` 生成随机管理员密码，填入 `P0_ADMIN_TOKEN`，不要保留空值或示例密码。
-2. 将 `PUBLISH_IP` 改为 NAS 的真实局域网 IP；保留 `127.0.0.1` 时只能在 Docker 主机本机访问。
-3. 按需修改 `PUBLISH_PORT`，默认 `18765`。妥善保管 `.env`，建议权限 `600`。
+保存为 `compose.yaml`，填写 `P0_ADMIN_TOKEN` 后，在该文件目录执行：
 
 ```sh
 docker compose up -d
-docker compose ps
 ```
 
-打开 `http://NAS局域网IP:18765/admin`，使用 `.env` 中的初始管理员密码登录。网页内修改密码后，以新密码登录。普通用户入口为 `/play`。
+打开 `http://NAS局域网IP:18765/admin`，用你填写的管理员令牌登录。普通用户入口为 `/play`。小米、Navidrome 和企业微信的账号都在网页中配置。管理员登录密码也可在“其他设置”修改，最低 8 位。
 
-Compose 默认使用 Docker 命名卷保存私有数据，升级容器不会清空进度。需要绑定 NAS 目录时，将 `data:/data` 改为自己的目录，并确保容器用户 `10001:10001` 可以读写；不要将整个 NAS 或其他应用的数据目录挂载进容器。
+左侧 `18765` 可改为你要的端口；左侧 `./data` 可改为 NAS 的专用绝对目录，例如 `/volume1/docker/xiaoaibooks/data`。右侧的 `/data` 与端口 `18765` 保持不变。该目录保存私有设置、书源和断点，升级容器时继续使用同一个目录。
+
+令牌为空或不足 8 位时，容器会提示并拒绝启动。容器首次启动自动准备新数据目录，服务随后以普通用户运行，无需填写 UID/GID 或额外执行权限脚本。
 
 ## Docker 命令部署
 
-下面与 Compose 使用同一镜像；请将管理员密码和端口绑定 IP 改为自己的值。
+同样只需修改端口、专用数据目录与至少 8 位的管理员令牌：
 
 ```sh
 docker run -d \
   --name xiaoaibooks \
   --restart unless-stopped \
-  --read-only --tmpfs /tmp:size=256m,mode=1777 --shm-size=128m \
-  --cap-drop ALL --security-opt no-new-privileges:true \
-  --memory 1536m --cpus 2 \
   --stop-timeout 90 \
-  -p NAS局域网IP:18765:18765 \
-  -e P0_ADMIN_TOKEN='替换为自己生成的随机密码' \
-  -e APP_DATA_DIR=/data \
-  -e XIAOMI_TOKEN_CACHE=/data/xiaomi-token.json \
-  -v xiaoaibooks-data:/data \
-  ghcr.io/xudong7587/xiaoaibooks:0.2.0
+  -p 18765:18765 \
+  -v /你的数据目录:/data \
+  -e P0_ADMIN_TOKEN='替换为至少8位的管理员令牌' \
+  ghcr.io/xudong7587/xiaoaibooks:0.2.1
 ```
 
 ## 首次设置
@@ -107,7 +104,9 @@ docker compose pull
 docker compose up -d
 ```
 
-更新前备份私有数据卷；数据库使用 SQLite，建议停容器后备份卷，或使用 SQLite 在线备份。不要把账号、会话、Cookie、私有书源或备份提交到 GitHub。`docker compose down` 保留卷；`down -v` 会删除卷和数据。
+新版 Compose 示例用于新部署。升级时保留原来的 `/data` 卷或目录映射及已有 `user` 设置，不要换成新的空目录。若沿用 0.2.0 公开模板中的 `cap_drop: [ALL]`，且原来没有写 `user`，请补上 `user: "10001:10001"`，继续使用旧版数据属主；不要只换镜像版本。这条兼容设置仅用于旧模板，新部署使用上面的精简示例即可。
+
+更新前备份映射的数据目录；数据库使用 SQLite，建议停容器后备份该目录，或使用 SQLite 在线备份。不要把账号、会话、Cookie、私有书源或备份提交到 GitHub。`docker compose down` 不会删除映射的数据目录；请勿手动清空该目录。
 
 ## 许可与源码说明
 
