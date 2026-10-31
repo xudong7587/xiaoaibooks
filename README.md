@@ -28,6 +28,8 @@ curl -fLO https://raw.githubusercontent.com/xudong7587/xiaoaibooks/main/.env.exa
 cp .env.example .env
 ```
 
+如果从 Release 附件下载，`default.env.example` 与仓库 `.env.example` 内容相同，将它复制为 `.env` 即可。
+
 编辑 `.env`：
 
 1. 用 `openssl rand -hex 32` 生成随机管理员密码，填入 `P0_ADMIN_TOKEN`，不要保留空值或示例密码。
