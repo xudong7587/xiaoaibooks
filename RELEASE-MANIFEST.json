@@ -1,31 +1,36 @@
 {
   "schema": 1,
-  "version": "0.2.10",
-  "release_tag": "v0.2.10",
-  "source_fingerprint": "cd04a0a27ded297c53401f01faf5e3e470dda24cbf0d77ee6a6f4ab13b7e8110",
+  "version": "0.2.11",
+  "release_tag": "v0.2.11",
+  "source_fingerprint": "085763a84569e207e03415b98728436467cad9953b514c40d6b8f37722c6086e",
   "image_id_semantics": "SHA256 of exact Docker archive Config JSON bytes",
   "images": [
     {
       "platform": "linux/amd64",
       "architecture": "amd64",
       "file": "image-linux-amd64.tar.gz",
-      "sha256": "f77f8e75ae3275f6d9ffdf6e60e34594d13a3b48723278a6bd2380fb4ff5a695",
-      "loaded_tag": "xiaoaibooks-release:0.2.10-amd64",
-      "image_id": "sha256:58211a21381ea673ac91bffde1e6c16c1334236f16a5868b864bc5efdeb70d12"
+      "sha256": "48eeafbedb5990cce610926cb60d930779b616205412e929c3116b1f19a107e3",
+      "loaded_tag": "xiaoaibooks-release:0.2.11-amd64",
+      "image_id": "sha256:617f9b759b72e2355b948792805e16b374b2c0fbe736167bc31b0270dfe733a2"
     },
     {
       "platform": "linux/arm64",
       "architecture": "arm64",
       "file": "image-linux-arm64.tar.gz",
-      "sha256": "0cbab2795069f8b5b1e39c542a657d6d81bea3a28c8f471d74bece165dd03311",
-      "loaded_tag": "xiaoaibooks-release:0.2.10-arm64",
-      "image_id": "sha256:b8026d75c4e13d121564df2cbe703a5f03e7556a7891c84527e18236ed0e4e63"
+      "sha256": "9d005395b58187e1a0bd99eef7f0ae3d94edd88d52f80f43a6549928fcf4f889",
+      "loaded_tag": "xiaoaibooks-release:0.2.11-arm64",
+      "image_id": "sha256:573dfb7e8df96b0b3f1c65b56f828dd4b83a83f9fe8f517297cb2569e761f5a3"
     }
   ],
   "validation": {
-    "backend_tests": 678,
-    "frontend_tests": 32,
+    "backend_tests": 679,
+    "frontend_tests": 33,
     "frontend_typecheck_build": "passed",
+    "browser_fixture_widths": [
+      390,
+      1440
+    ],
+    "verification_browser": "real Chromium delayed iframe/math and manual pointer fixtures; isolated desktop/mobile UI",
     "platforms": {
       "amd64": {
         "passed": true,
@@ -41,22 +46,6 @@
       "All Xiaomi models and firmware",
       "All mobile WebViews and installed web app background/lock screen playback",
       "Physical ARM64 NAS playback"
-    ],
-    "browser_baseline": {
-      "version": "0.2.9",
-      "widths": [
-        320,
-        390,
-        1440
-      ],
-      "scope": "Frontend files unchanged; current NAS prepared list checked after migration"
-    },
-    "music_migration": {
-      "nas_verified": true,
-      "legacy_music_keywords_removed": 13,
-      "book_keywords_preserved_including_archived": 4,
-      "all_progress_values_unchanged": true,
-      "prepared_music_count_after": 0
-    }
+    ]
   }
 }
