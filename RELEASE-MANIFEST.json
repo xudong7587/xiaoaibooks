@@ -1,54 +1,52 @@
 {
   "schema": 1,
-  "version": "0.2.1",
-  "release_tag": "v0.2.1",
-  "source_fingerprint": "2b2aaf50326d4ca8ac60e1930d42ba7bd17aa802b6c19f85607258ecc892975b",
+  "version": "0.2.8",
+  "release_tag": "v0.2.8",
+  "source_fingerprint": "911cd4815769fa4bbc2cd4a89a1c2ebd2c72342daceeeef5e731a83389e643e3",
   "image_id_semantics": "SHA256 of exact Docker archive Config JSON bytes",
   "images": [
     {
       "platform": "linux/amd64",
       "architecture": "amd64",
       "file": "image-linux-amd64.tar.gz",
-      "sha256": "a03a8638e0df9609a4c056c893cd0b6faf3642bcf266a768ad12fc4ca035c4c3",
-      "loaded_tag": "xiaoaibooks-release:0.2.1-amd64",
-      "image_id": "sha256:b24f0f53485f182d4501dc94e92d967b37c220e009f08dfccb291c21da9ae8e0"
+      "sha256": "3651492cea9b2cd3eef5f545a333b1973358ba085f5ff0f1d1459418da7a109b",
+      "loaded_tag": "xiaoaibooks-release:0.2.8-amd64",
+      "image_id": "sha256:992e40d7d145ae8bb640c0779c2d34186ab6cdbfe839334f22da89ffa44f6f6f"
     },
     {
       "platform": "linux/arm64",
       "architecture": "arm64",
       "file": "image-linux-arm64.tar.gz",
-      "sha256": "c203d75fd04f93c927911d2620fc138c3a52b2e2611edb81aa6027cda1a2bc06",
-      "loaded_tag": "xiaoaibooks-release:0.2.1-arm64",
-      "image_id": "sha256:21f8a8f21a6cf2705f93c459e20391c44e1719723541f358f1ad1f2e44b441c2"
+      "sha256": "0bbc39a1d32fa92d5ffd4638b2df220aa555093016aba9b668d2b3c5c0e827f8",
+      "loaded_tag": "xiaoaibooks-release:0.2.8-arm64",
+      "image_id": "sha256:a8ffa5e8b30320c0a7a5c35e03806a628481631dcb2639004202f975ef731938"
     }
   ],
   "validation": {
-    "backend_tests": 615,
+    "backend_tests": 661,
     "frontend_tests": 32,
     "frontend_typecheck_build": "passed",
-    "entrypoint_linux_permission_checks": 24,
-    "full_arm64_bind_checks": 21,
+    "browser_fixture_widths": [
+      320,
+      360,
+      390,
+      1440
+    ],
     "platforms": {
       "amd64": {
-        "image_checks": 70,
         "passed": true,
-        "runtime_nonroot": true,
-        "first_token_characters": 8,
-        "sources_bundled": false
+        "image_checks": 86
       },
       "arm64": {
-        "image_checks": 70,
         "passed": true,
-        "runtime_nonroot": true,
-        "first_token_characters": 8,
-        "sources_bundled": false
+        "image_checks": 78
       }
     },
-    "nas_restart_data_retention": "passed",
-    "wecom_administrator_search_and_numbered_prepare": "accepted_by_user",
+    "real_speaker_volume": "read and same-value write verified in preceding 0.2.6 acceptance; protocol unchanged",
     "not_covered": [
       "All Xiaomi models and firmware",
-      "Wildcard training for arbitrary music names"
+      "All mobile WebViews and installed web app background/lock screen playback",
+      "Physical ARM64 NAS playback"
     ]
   }
 }
