@@ -1,36 +1,31 @@
 {
   "schema": 1,
-  "version": "0.2.9",
-  "release_tag": "v0.2.9",
-  "source_fingerprint": "47da0a4f100a73db487abc7e223574afe755acf2eac9eca82c921eb8bb043729",
+  "version": "0.2.10",
+  "release_tag": "v0.2.10",
+  "source_fingerprint": "cd04a0a27ded297c53401f01faf5e3e470dda24cbf0d77ee6a6f4ab13b7e8110",
   "image_id_semantics": "SHA256 of exact Docker archive Config JSON bytes",
   "images": [
     {
       "platform": "linux/amd64",
       "architecture": "amd64",
       "file": "image-linux-amd64.tar.gz",
-      "sha256": "7fb455524eef06ec1b80c3f26a2b9f10bbe68777541a1b65ad12f97365f4a978",
-      "loaded_tag": "xiaoaibooks-release:0.2.9-amd64",
-      "image_id": "sha256:1ff9e7944fd05574024b3d268a5b5fbaa21548af22d9df8de50966ef1d720fe3"
+      "sha256": "f77f8e75ae3275f6d9ffdf6e60e34594d13a3b48723278a6bd2380fb4ff5a695",
+      "loaded_tag": "xiaoaibooks-release:0.2.10-amd64",
+      "image_id": "sha256:58211a21381ea673ac91bffde1e6c16c1334236f16a5868b864bc5efdeb70d12"
     },
     {
       "platform": "linux/arm64",
       "architecture": "arm64",
       "file": "image-linux-arm64.tar.gz",
-      "sha256": "1bbaeccfdd88cc2a514641e888d7fc22bb0fb9956d70ca4ea0c0e88f778a450a",
-      "loaded_tag": "xiaoaibooks-release:0.2.9-arm64",
-      "image_id": "sha256:c5cc8b097f8fa4676fb44b12d52da84d358099bbfaf05dca64c9dada9611dc05"
+      "sha256": "0cbab2795069f8b5b1e39c542a657d6d81bea3a28c8f471d74bece165dd03311",
+      "loaded_tag": "xiaoaibooks-release:0.2.10-arm64",
+      "image_id": "sha256:b8026d75c4e13d121564df2cbe703a5f03e7556a7891c84527e18236ed0e4e63"
     }
   ],
   "validation": {
-    "backend_tests": 676,
+    "backend_tests": 678,
     "frontend_tests": 32,
     "frontend_typecheck_build": "passed",
-    "browser_fixture_widths": [
-      320,
-      390,
-      1440
-    ],
     "platforms": {
       "amd64": {
         "passed": true,
@@ -46,6 +41,22 @@
       "All Xiaomi models and firmware",
       "All mobile WebViews and installed web app background/lock screen playback",
       "Physical ARM64 NAS playback"
-    ]
+    ],
+    "browser_baseline": {
+      "version": "0.2.9",
+      "widths": [
+        320,
+        390,
+        1440
+      ],
+      "scope": "Frontend files unchanged; current NAS prepared list checked after migration"
+    },
+    "music_migration": {
+      "nas_verified": true,
+      "legacy_music_keywords_removed": 13,
+      "book_keywords_preserved_including_archived": 4,
+      "all_progress_values_unchanged": true,
+      "prepared_music_count_after": 0
+    }
   }
 }
