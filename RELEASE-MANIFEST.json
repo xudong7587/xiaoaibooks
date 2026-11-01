@@ -11,7 +11,7 @@
       "file": "image-linux-amd64.tar.gz",
       "sha256": "3651492cea9b2cd3eef5f545a333b1973358ba085f5ff0f1d1459418da7a109b",
       "loaded_tag": "xiaoaibooks-release:0.2.8-amd64",
-      "image_id": "sha256:992e40d7d145ae8bb640c0779c2d34186ab6cdbfe839334f22da89ffa44f6f6f"
+      "image_id": "sha256:a43d142f3fbdad59bb7f6e7e1c3de33b10458179e34fb8c469390553a0670549"
     },
     {
       "platform": "linux/arm64",
@@ -19,7 +19,7 @@
       "file": "image-linux-arm64.tar.gz",
       "sha256": "0bbc39a1d32fa92d5ffd4638b2df220aa555093016aba9b668d2b3c5c0e827f8",
       "loaded_tag": "xiaoaibooks-release:0.2.8-arm64",
-      "image_id": "sha256:a8ffa5e8b30320c0a7a5c35e03806a628481631dcb2639004202f975ef731938"
+      "image_id": "sha256:d41c3b54541623b754533570b2cf09320fe13835a5da64b9cc4f2283993cfdee"
     }
   ],
   "validation": {
