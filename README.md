@@ -1,5 +1,7 @@
 # 小爱听书 · XiaoAiBooks
 
+> 0.2.13 已完成本机检查并用于 NAS 更新，新增固定导航、行内验证及企业微信逐题排队。当前网络中断，GitHub 镜像附件与 GHCR 标签尚未发布；以下容器命令暂保持可拉取的 0.2.12。待网络恢复后再发布已验证的同一批镜像。
+
 **本地自托管的听书项目，仅用于技术探索。作者不提供、托管或分发任何媒体源、书源订阅、音视频版权文件或付费资源。**
 
 在自己的 NAS 上部署，管理自己有权使用的资源，将听书或 Navidrome 音乐投送至家中的小爱音箱，也可以在浏览器收听。“本地”指服务由自己部署；用户导入的在线书源按需解析和流式转发，不在 NAS 下载或保存有声书文件。
@@ -23,7 +25,7 @@
 ```yaml
 services:
   app:
-    image: ghcr.io/xudong7587/xiaoaibooks:0.2.13
+    image: ghcr.io/xudong7587/xiaoaibooks:0.2.12
     container_name: xiaoaibooks
     ports:
       - "18765:18765" # 左侧为 NAS 端口
@@ -59,7 +61,7 @@ docker run -d \
   -p 18765:18765 \
   -v /你的数据目录:/data \
   -e P0_ADMIN_TOKEN='替换为至少8位的管理员令牌' \
-  ghcr.io/xudong7587/xiaoaibooks:0.2.13
+  ghcr.io/xudong7587/xiaoaibooks:0.2.12
 ```
 
 ## 首次设置

@@ -49,5 +49,10 @@
       "All user source packs and actual Navidrome instances",
       "All speaker models and firmware; no real speaker output in this review"
     ]
+  },
+  "publication": {
+    "status": "pending_network",
+    "reason": "Mac connection to GitHub closed during upload; release assets and GHCR tags have not been published",
+    "validated_archives_retained": true
   }
 }
