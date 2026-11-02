@@ -1,0 +1,88 @@
+{
+  "version": "0.2.12",
+  "date": "2026-11-02",
+  "scope": [
+    "小米账号与官方二次验证",
+    "本地与远程书源导入",
+    "Navidrome 保存并连接",
+    "搜索、确认版本、准备共享节目",
+    "失败重试、刷新重启、并发及权限边界"
+  ],
+  "findings": [
+    {
+      "id": "XIAOMI-01",
+      "status": "fixed",
+      "problem": "首次二次验证响应缺少完整账号状态，重新连接与取消入口不显示",
+      "change": "返回完整状态，待连接账号也显示继续入口"
+    },
+    {
+      "id": "XIAOMI-02",
+      "status": "fixed",
+      "problem": "刷新后官方验证链接丢失，旧链接可能残留",
+      "change": "恢复当前账号的私有验证链接，检查 HTTPS 小米域名，成功或取消后清除"
+    },
+    {
+      "id": "SOURCES-01",
+      "status": "fixed",
+      "problem": "非对象 manifest 可触发服务端异常，内置入口可被重名书源干扰",
+      "change": "拒绝无效清单与保留名称，返回明确错误并清理暂存目录"
+    },
+    {
+      "id": "SOURCES-02",
+      "status": "fixed",
+      "problem": "导入的多项配置分别写入，存储失败时可能只更新一部分",
+      "change": "配置、书源目录、包引用和更新地址在同一事务中保存；失败整体回滚"
+    },
+    {
+      "id": "NAVIDROME-01",
+      "status": "fixed",
+      "problem": "保存并连接先覆盖旧配置再验证，错误的新连接会影响原库",
+      "change": "候选连接隔离验证，成功才保存；失败保留原配置与播放票据；切换串行处理"
+    },
+    {
+      "id": "PROGRAM-01",
+      "status": "fixed",
+      "problem": "坏搜索结果与坏章节目录可触发异常或写入不可用节目",
+      "change": "校验返回对象、列表、必要名称和资源引用；坏结果隔离为书源错误，坏目录不能保存"
+    },
+    {
+      "id": "PROGRAM-02",
+      "status": "fixed",
+      "problem": "请求期间更换书源包后，旧结果仍可能进入详情缓存或节目库",
+      "change": "请求返回时复核书源包与启用状态，变化后要求重新搜索"
+    }
+  ],
+  "validation": {
+    "command": "bash scripts/verify-local.sh",
+    "backend_tests": 717,
+    "frontend_tests": 33,
+    "typecheck_build": "passed",
+    "browser_widths": [
+      390,
+      1440
+    ],
+    "browser_commands": [
+      ".venv/bin/python scripts/verify-xiaomi-ui.py",
+      ".venv/bin/python scripts/verify-onboarding-ui.py"
+    ],
+    "browser_checks": [
+      "首次验证、新标签页入口、刷新、取消、复用账号重连、清除旧链接",
+      "真实 SQLite 与 Java 书源运行器的空配置导入、搜索、详情、添加与刷新",
+      "坏 ZIP、坏目录、空目录、重复关键字后修改重试",
+      "错误 Navidrome 凭据、有效重试及失败换库保留原设置"
+    ],
+    "additional_checks": [
+      "存储失败事务回滚",
+      "并发关键字唯一性",
+      "并发音乐库切换隔离",
+      "管理员与普通用户修改权限",
+      "新账号失败保留已连接账号"
+    ]
+  },
+  "not_covered": [
+    "真实小米短信送达、官方页面策略及全新真实账号二次验证",
+    "用户自有全部书源、实际 Navidrome 服务及网络环境",
+    "所有小爱型号和固件的播放、语音、暂停续播、队列及音质；本轮没有实际投送音箱"
+  ],
+  "release_status": "local validation passed; image audit and publication tracked separately in RELEASE-MANIFEST.json and REGISTRY-MANIFEST.json"
+}

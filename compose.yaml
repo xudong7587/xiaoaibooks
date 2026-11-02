@@ -1,6 +1,6 @@
 services:
   app:
-    image: ghcr.io/xudong7587/xiaoaibooks:0.2.11
+    image: ghcr.io/xudong7587/xiaoaibooks:0.2.12
     container_name: xiaoaibooks
     ports:
       - "18765:18765" # 左侧为 NAS 端口

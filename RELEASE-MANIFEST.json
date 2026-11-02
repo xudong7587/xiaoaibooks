@@ -1,51 +1,50 @@
 {
   "schema": 1,
-  "version": "0.2.11",
-  "release_tag": "v0.2.11",
-  "source_fingerprint": "085763a84569e207e03415b98728436467cad9953b514c40d6b8f37722c6086e",
+  "version": "0.2.12",
+  "release_tag": "v0.2.12",
+  "source_fingerprint": "400a0e1dfed6b3bf506941b9917395b6e6741baa562dd8b73db477104a3c4f0f",
   "image_id_semantics": "SHA256 of exact Docker archive Config JSON bytes",
   "images": [
     {
       "platform": "linux/amd64",
       "architecture": "amd64",
       "file": "image-linux-amd64.tar.gz",
-      "sha256": "48eeafbedb5990cce610926cb60d930779b616205412e929c3116b1f19a107e3",
-      "loaded_tag": "xiaoaibooks-release:0.2.11-amd64",
-      "image_id": "sha256:617f9b759b72e2355b948792805e16b374b2c0fbe736167bc31b0270dfe733a2"
+      "sha256": "2149b9217c0108fe137e4c9755c8e1f1ed3622c3e6c742d43b75ae47ef8623c9",
+      "loaded_tag": "xiaoaibooks-release:0.2.12-amd64",
+      "image_id": "sha256:bb5df48346f8f5323ced2633cb8a4e10a26dbacf945e0d6235bfab4594edcd46"
     },
     {
       "platform": "linux/arm64",
       "architecture": "arm64",
       "file": "image-linux-arm64.tar.gz",
-      "sha256": "9d005395b58187e1a0bd99eef7f0ae3d94edd88d52f80f43a6549928fcf4f889",
-      "loaded_tag": "xiaoaibooks-release:0.2.11-arm64",
-      "image_id": "sha256:573dfb7e8df96b0b3f1c65b56f828dd4b83a83f9fe8f517297cb2569e761f5a3"
+      "sha256": "86f15d3b39e1ca08d5463b53317e0152e753907322f6b03670b728237c1e897c",
+      "loaded_tag": "xiaoaibooks-release:0.2.12-arm64",
+      "image_id": "sha256:20d799a9d5a7b7e3fe78f78ebd2dd2a204c95b3d8afdfd461adb732b50db1504"
     }
   ],
   "validation": {
-    "backend_tests": 679,
+    "backend_tests": 717,
     "frontend_tests": 33,
     "frontend_typecheck_build": "passed",
     "browser_fixture_widths": [
       390,
       1440
     ],
-    "verification_browser": "real Chromium delayed iframe/math and manual pointer fixtures; isolated desktop/mobile UI",
+    "onboarding_browser": "real SQLite and Java source runtime with isolated Chromium; Xiaomi and Navidrome identity providers use offline fixtures",
     "platforms": {
       "amd64": {
         "passed": true,
-        "image_checks": 86
+        "image_checks": 131
       },
       "arm64": {
         "passed": true,
-        "image_checks": 78
+        "image_checks": 119
       }
     },
-    "real_speaker_volume": "read and same-value write verified in preceding 0.2.6 acceptance; protocol unchanged",
     "not_covered": [
-      "All Xiaomi models and firmware",
-      "All mobile WebViews and installed web app background/lock screen playback",
-      "Physical ARM64 NAS playback"
+      "Real Xiaomi SMS and fresh-account official verification",
+      "All user source packs and actual Navidrome instances",
+      "All speaker models and firmware; no real speaker output in this review"
     ]
   }
 }
