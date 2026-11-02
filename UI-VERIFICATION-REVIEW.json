@@ -1,0 +1,43 @@
+{
+  "version": "0.2.13",
+  "passed": true,
+  "scope": "Local Mac verification; no real CAPTCHA, WeCom outbound message or speaker playback in regression tests",
+  "commands": [
+    ".venv/bin/python -m pytest -q",
+    "npm --prefix web test",
+    "npm --prefix web run build",
+    ".venv/bin/python scripts/verify-xiaomi-ui.py",
+    ".venv/bin/python scripts/verify-onboarding-ui.py",
+    ".venv/bin/python scripts/verify-source-verification-ui.py",
+    ".venv/bin/python scripts/package-source.py --check-only"
+  ],
+  "backend_tests": 726,
+  "frontend_tests": 34,
+  "source_verification_viewports": [
+    1440,
+    900,
+    390
+  ],
+  "checks": [
+    "fixed sidebar in light/dark and glass styling",
+    "source-row expand/collapse without duplicate tasks or background image polling",
+    "completed dismissal survives polling and reload",
+    "closing completed tasks preserves owner isolation and newer same-source browser session",
+    "success remains closable when follow-up source check fails",
+    "independent page keeps completed results and supports closing",
+    "WeCom serial delivery per account with concurrency protection",
+    "failed answer retains active question",
+    "old callback target remains bound to original task",
+    "expired/cancelled/web-completed tasks advance the queue",
+    "application and binding changes discard old queued messages",
+    "partial notification retry does not resend image",
+    "unsent task prefix cannot skip queue",
+    "separate account queues remain independent",
+    "next question waits for current reply result to be sent"
+  ],
+  "not_covered": [
+    "Real WeCom delivery latency and mobile client rendering",
+    "Real source CAPTCHA and Xiaomi official challenges",
+    "All speaker models, firmware and actual voice playback"
+  ]
+}

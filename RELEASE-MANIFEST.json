@@ -1,35 +1,38 @@
 {
   "schema": 1,
-  "version": "0.2.12",
-  "release_tag": "v0.2.12",
-  "source_fingerprint": "400a0e1dfed6b3bf506941b9917395b6e6741baa562dd8b73db477104a3c4f0f",
+  "version": "0.2.13",
+  "release_tag": "v0.2.13",
+  "source_fingerprint": "9f16c1dc20aef37c9731c3c501ddb09dd578836582e33f43147d12533eb0298e",
   "image_id_semantics": "SHA256 of exact Docker archive Config JSON bytes",
   "images": [
     {
       "platform": "linux/amd64",
       "architecture": "amd64",
       "file": "image-linux-amd64.tar.gz",
-      "sha256": "2149b9217c0108fe137e4c9755c8e1f1ed3622c3e6c742d43b75ae47ef8623c9",
-      "loaded_tag": "xiaoaibooks-release:0.2.12-amd64",
-      "image_id": "sha256:bb5df48346f8f5323ced2633cb8a4e10a26dbacf945e0d6235bfab4594edcd46"
+      "sha256": "2706df80fa5dd03f600d0af8f57e09f7d1f4a3fcc1d50adb588feddf9f9b13f9",
+      "loaded_tag": "xiaoaibooks-release:0.2.13-amd64",
+      "image_id": "sha256:4ef12b567484db0201117eb93b0c0ba3f5f40f6ed055dd3a358b7254cfbb7af7"
     },
     {
       "platform": "linux/arm64",
       "architecture": "arm64",
       "file": "image-linux-arm64.tar.gz",
-      "sha256": "86f15d3b39e1ca08d5463b53317e0152e753907322f6b03670b728237c1e897c",
-      "loaded_tag": "xiaoaibooks-release:0.2.12-arm64",
-      "image_id": "sha256:20d799a9d5a7b7e3fe78f78ebd2dd2a204c95b3d8afdfd461adb732b50db1504"
+      "sha256": "f5276f86d9bfb42b065a966cc6ecff00f4b04e292072fe86e5966559c358f5b9",
+      "loaded_tag": "xiaoaibooks-release:0.2.13-arm64",
+      "image_id": "sha256:c4944fadae4c47f572b3298a3a6230b97ad3159c2aadedfa3433f635315e499b"
     }
   ],
   "validation": {
-    "backend_tests": 717,
-    "frontend_tests": 33,
+    "backend_tests": 726,
+    "frontend_tests": 34,
     "frontend_typecheck_build": "passed",
     "browser_fixture_widths": [
       390,
+      900,
       1440
     ],
+    "source_row_browser": "fixed navigation, expand/collapse, completed dismissal, poll/reload persistence, standalone page",
+    "wecom_queue": "offline concurrent delivery, failed answer, reply pinning, replay, expiry/cancellation, configuration/binding invalidation and partial send retry",
     "onboarding_browser": "real SQLite and Java source runtime with isolated Chromium; Xiaomi and Navidrome identity providers use offline fixtures",
     "platforms": {
       "amd64": {
