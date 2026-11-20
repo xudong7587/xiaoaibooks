@@ -4,7 +4,7 @@
 
 | 软件 | 固定版本／许可 | 随镜像保留的文本和来源 |
 | --- | --- | --- |
-| SunnyUI design system | 2.1.0，GPL-3.0-only | `GPL-3.0-only.txt`；固定提交 `e44fc8823599c7158a43d6952d1bd521b2895b0c`，对应源码内 `web/SUNNY-UI-SOURCE.json`。[上游](https://github.com/xudong7587/sunny-ui-design-system/tree/e44fc8823599c7158a43d6952d1bd521b2895b0c) |
+| SunnyUI design system | 2.2.0 本机规范快照，GPL-3.0-only | `GPL-3.0-only.txt`。基础修订和扩展校验见对应源码内 `web/SUNNY-UI-SOURCE.json`。[基础修订](https://github.com/xudong7587/sunny-ui-design-system/tree/dfd6c586c4fb7571afba63750d64d76d989e6e1c) |
 | SunnyUI 液态玻璃几何 | Apache-2.0 | `Apache-2.0.txt`、`SunnyUI-liquid-glass-NOTICE.txt`；Copyright 2026 compose-miuix-ui contributors，原始透镜来源 Kyant0/AndroidLiquidGlass。[固定上游](https://github.com/compose-miuix-ui/miuix/tree/153920c7e196de1f1c8188e16162f3ce4864b016)。网页移植范围和修改见 NOTICE，未复制 Android 渲染管线。 |
 | React / ReactDOM | 19.2.7，MIT | `react-19.2.7-LICENSE.txt`、`react-dom-19.2.7-LICENSE.txt`；[上游](https://github.com/facebook/react)。 |
 | Phosphor React icons | 2.1.10，MIT | `phosphor-icons-react-2.1.10-LICENSE.txt`；[上游](https://github.com/phosphor-icons/react)。 |

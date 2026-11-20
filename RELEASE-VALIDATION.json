@@ -1,0 +1,31 @@
+{
+  "version": "0.2.16",
+  "source_fingerprint": "f8146a66ea24a61e2c09ee7bcdf8cbc0410d57555b8000913f6b7eaa638edf63",
+  "local_verification": {
+    "command": "scripts/verify-local.sh",
+    "backend_tests": 811,
+    "frontend_tests": 35,
+    "browser_viewport_widths_px": [
+      320,
+      390,
+      700,
+      900,
+      1440
+    ],
+    "appearance_combinations": 480,
+    "standalone_web_app_install_and_launch_in_isolated_chromium": true,
+    "physical_phone_installation_verified": false
+  },
+  "image_audits": {
+    "linux/amd64": {
+      "checks": 170,
+      "fresh_start_and_restart": true
+    },
+    "linux/arm64": {
+      "checks": 134,
+      "fresh_start_and_restart": true
+    }
+  },
+  "artifact_publication_workflow": "Verify and publish locally built archives",
+  "cloud_image_build": false
+}
